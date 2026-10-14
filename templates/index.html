@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>InspireWorks IVR Demo</title>
+  <style>
+    :root { --bg: #f6f7f9; --card: #fff; --text: #1d2330; --muted: #5f6b7a; --accent: #2f6fed; --err: #c0392b; --ok: #1e8e3e; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #14171c; --card: #1d2128; --text: #e8eaee; --muted: #9aa3ae; --accent: #6b9bff; --err: #ff7b6e; --ok: #5fd07f; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px;
+           font: 16px/1.5 system-ui, sans-serif; background: var(--bg); color: var(--text); }
+    main { width: 100%; max-width: 420px; background: var(--card); border-radius: 12px; padding: 28px;
+           box-shadow: 0 2px 12px rgb(0 0 0 / .08); }
+    h1 { margin: 0 0 4px; font-size: 1.4rem; }
+    p { margin: 0 0 20px; color: var(--muted); }
+    label { display: block; font-weight: 600; margin-bottom: 6px; }
+    input { width: 100%; padding: 10px 12px; font-size: 1rem; border: 1px solid #8884; border-radius: 8px;
+            background: transparent; color: inherit; }
+    button { width: 100%; margin-top: 14px; padding: 11px; font-size: 1rem; font-weight: 600; border: 0;
+             border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { margin-top: 14px; min-height: 1.5em; }
+    .ok { color: var(--ok); } .err { color: var(--err); }
+  </style>
+</head>
+<body>
+<main>
+  <h1>InspireWorks IVR Demo</h1>
+  <p>Places a call from {{ from_number }}. Answer it, enter your OTP, then pick a language and an option.</p>
+  <form id="call-form">
+    <label for="to">Your phone number</label>
+    <input id="to" name="to" type="tel" placeholder="+919876543210" value="{{ default_to }}" required>
+    <button type="submit">Call me</button>
+  </form>
+  <div id="status" role="status"></div>
+</main>
+<script>
+  const form = document.getElementById('call-form');
+  const status = document.getElementById('status');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const button = form.querySelector('button');
+    button.disabled = true;
+    status.className = '';
+    status.textContent = 'Placing call…';
+    try {
+      const res = await fetch('/call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: form.to.value.trim() }),
+      });
+      const data = await res.json();
+      status.className = res.ok ? 'ok' : 'err';
+      status.textContent = res.ok ? `Calling… (request ${data.request_uuid})` : data.error;
+    } catch (err) {
+      status.className = 'err';
+      status.textContent = 'Could not reach the server.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
