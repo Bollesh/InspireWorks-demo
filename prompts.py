@@ -5,7 +5,8 @@ LANGUAGES = ("en", "es")
 PROMPTS = {
     "en": {
         "voice_lang": "en-US",
-        "greeting": "Hello, this is InspireWorks.",
+        "greeting_outbound": "Hello, this is InspireWorks.",
+        "greeting_inbound": "Thank you for calling InspireWorks.",
         "otp": "Please enter your 4 digit O T P.",
         "otp_wrong": "Incorrect O T P. Please try again.",
         "otp_ok": "Authentication successful.",

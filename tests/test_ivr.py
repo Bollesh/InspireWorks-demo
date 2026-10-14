@@ -15,10 +15,12 @@ def redirect_target(root):
     return root.find("Redirect").text
 
 
-def test_answer_greets_then_goes_to_otp():
-    root = parse(ivr.answer(BASE))
-    assert "InspireWorks" in root.find("Speak").text
-    assert redirect_target(root) == f"{BASE}/otp"
+def test_answer_greets_by_direction_then_goes_to_otp():
+    inbound = parse(ivr.answer(BASE, "inbound"))
+    outbound = parse(ivr.answer(BASE, "outbound"))
+    assert "calling" in inbound.find("Speak").text
+    assert "this is InspireWorks" in outbound.find("Speak").text
+    assert redirect_target(inbound) == redirect_target(outbound) == f"{BASE}/otp"
 
 
 def test_otp_prompt_collects_four_dtmf_digits_without_logging():

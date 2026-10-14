@@ -27,12 +27,13 @@ def _say(response, lang, key):
     response.add_speak(t(lang, key), language=voice(lang))
 
 
-# --- Entry point -------------------------------------------------------------
+# --- Entry point (shared by outbound and inbound calls) ---------------------
 
-def answer(base):
+def answer(base, direction):
     """Greet the caller once, then hand off to the OTP prompt."""
     r = plivoxml.ResponseElement()
-    _say(r, "en", "greeting")
+    key = "greeting_inbound" if direction == "inbound" else "greeting_outbound"
+    _say(r, "en", key)
     r.add_redirect(f"{base}/otp", method="POST")
     return r.to_string()
 

@@ -29,7 +29,7 @@ def param(name, default=""):
 
 def log_step(step, **extra):
     fields = " ".join(f"{k}={v}" for k, v in extra.items())
-    log.info("call=%s step=%s %s", param("CallUUID", "-"), step, fields)
+    log.info("call=%s dir=%s step=%s %s", param("CallUUID", "-"), param("Direction", "-"), step, fields)
 
 
 @app.before_request
@@ -82,7 +82,7 @@ def make_call():
 @app.route("/answer", methods=IVR_METHODS)
 def answer():
     log_step("answer", frm=param("From"), to=param("To"))
-    return xml(ivr.answer(base_url()))
+    return xml(ivr.answer(base_url(), param("Direction")))
 
 
 @app.route("/otp", methods=IVR_METHODS)

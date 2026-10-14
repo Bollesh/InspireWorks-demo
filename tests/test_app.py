@@ -37,6 +37,12 @@ def test_full_flow_wrong_then_right_otp_to_associate(client):
     assert post_xml(client, "/menu-select?lang=es", Digits="2").find("Dial") is not None
 
 
+def test_inbound_call_uses_same_entry_point(client):
+    root = post_xml(client, "/answer", Direction="inbound", From="919876543210")
+    assert "calling" in root.find("Speak").text
+    assert root.find("Redirect").text == f"{BASE}/otp"
+
+
 def test_call_rejects_non_e164_number(client):
     resp = client.post("/call", json={"to": "98765"})
     assert resp.status_code == 400
