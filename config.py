@@ -15,7 +15,6 @@ PLIVO_FROM_NUMBER = os.getenv("PLIVO_FROM_NUMBER", "+918035454161")
 ASSOCIATE_NUMBER = os.getenv("ASSOCIATE_NUMBER", "+912264236412")
 DEFAULT_TO_NUMBER = os.getenv("DEFAULT_TO_NUMBER", "")
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "").rstrip("/")
-PLIVO_APP_ID = os.getenv("PLIVO_APP_ID", "")
 VALIDATE_SIGNATURE = os.getenv("VALIDATE_SIGNATURE", "false").lower() == "true"
 
 # Hardcoded OTP: birthdate in DDMM. The env var only overrides it for convenience.

@@ -59,7 +59,6 @@ Settings in `.env`:
 | `PUBLIC_BASE_URL` | Your ngrok HTTPS URL, with no trailing slash |
 | `OTP_CODE` | Birthdate in `DDMM` (e.g. March 15 → `1503`) |
 | `AUDIO_URL` | Public HTTPS MP3 for option 1 (Plivo accepts MP3/WAV up to 10 MB) |
-| `PLIVO_APP_ID` | Inbound only. Printed by `setup_inbound.py`. |
 | `VALIDATE_SIGNATURE` | `true` rejects webhooks without a valid `X-Plivo-Signature-V3` |
 
 ## Run
@@ -83,7 +82,7 @@ Outbound calls need no setup because each call carries its own `answer_url`. Inb
 The assigned number is shared and already linked to another application. Routing inbound calls to this app therefore means temporarily taking the number over. `setup_inbound.py` does that and remembers the previous link, and `--restore` hands the number back.
 
 ```bash
-python setup_inbound.py     # first run prints PLIVO_APP_ID; add it to .env
+python setup_inbound.py     # creates/updates the app and links the number
 ```
 Then dial `+918035454161` from your phone. Re-run `setup_inbound.py` whenever the ngrok URL changes.
 

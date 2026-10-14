@@ -3,8 +3,8 @@
     python setup_inbound.py            # point the number at this app
     python setup_inbound.py --restore  # give the number back to its previous app
 
-Setup creates (or, if PLIVO_APP_ID is set, updates) a Plivo Application whose
-answer_url is PUBLIC_BASE_URL/answer, then links PLIVO_FROM_NUMBER to it. The
+Setup creates (or, if it already exists, updates) a Plivo Application named
+InspireWorks-IVR whose answer_url is PUBLIC_BASE_URL/answer, then links PLIVO_FROM_NUMBER to it. The
 app the number was linked to before is saved to .inbound_restore so --restore
 can put it back; the number is shared, so restore as soon as you're done.
 Re-run setup after every ngrok restart, since the public URL changes.
@@ -27,6 +27,14 @@ def linked_app_id(client, number):
     return app_uri.rstrip("/").rsplit("/", 1)[-1] if "/Application/" in app_uri else ""
 
 
+def find_app_id(client, name):
+    """ID of this account's application called `name`, or '' if there is none."""
+    for app in client.applications.list(limit=20):
+        if app["app_name"] == name:
+            return app["app_id"]
+    return ""
+
+
 def setup(client, number):
     urls = dict(
         answer_url=f"{config.PUBLIC_BASE_URL}/answer",
@@ -34,13 +42,13 @@ def setup(client, number):
         hangup_url=f"{config.PUBLIC_BASE_URL}/hangup",
         hangup_method="POST",
     )
-    if config.PLIVO_APP_ID:
-        client.applications.update(config.PLIVO_APP_ID, **urls)
-        app_id = config.PLIVO_APP_ID
-        print(f"Updated application {app_id}")
+    app_id = find_app_id(client, APP_NAME)
+    if app_id:
+        client.applications.update(app_id, **urls)
+        print(f"Updated application {APP_NAME} ({app_id})")
     else:
         app_id = client.applications.create(app_name=APP_NAME, **urls)["app_id"]
-        print(f"Created application {app_id}. Add this line to .env:\nPLIVO_APP_ID={app_id}")
+        print(f"Created application {APP_NAME} ({app_id})")
 
     previous = linked_app_id(client, number)
     # Don't overwrite the saved link with our own app on a re-run.
